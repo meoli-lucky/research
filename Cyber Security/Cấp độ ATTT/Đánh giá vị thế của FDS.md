@@ -1,0 +1,9 @@
+| Nhóm ngoài phát triển phần mềm     | Khoảng trống chính                                                                                                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tư vấn tuân thủ ATTT/ANM**       | Chưa đủ năng lực chuyển tiêu chuẩn thành quy trình, biểu mẫu, checklist, hồ sơ bằng chứng, sổ rủi ro, báo cáo tuân thủ.                                                 |
+| **Thiết kế mạng an toàn tổng thể** | Làm được mạng logic cho hệ thống ứng dụng, nhưng chưa mạnh về mạng vật lý DC/toàn tổ chức: core, edge, DMZ, WAN, dual ISP, HA firewall, firewall liên vùng.             |
+| **Triển khai an toàn hạ tầng**     | Chưa đủ kinh nghiệm triển khai IPS/IDS, NAC, PAM, EDR, DLP, SIEM, backup tập trung, DR site.                                                                            |
+| **Giám sát an ninh tập trung**     | Chưa có năng lực đầy đủ về SIEM/SOC, chuẩn hóa log, luật cảnh báo, correlation, vận hành giám sát 24/7.                                                                 |
+| **Quản lý lỗ hổng**                | Mới có một phần ở mã nguồn như SonarQube/Gitleaks, chưa có quy trình quản lý lỗ hổng toàn diện cho hạ tầng, container, thư viện, cấu hình, CVE, SLA xử lý.              |
+| **Ứng phó sự cố an ninh mạng**     | Có thể hỗ trợ ở tầng ứng dụng, nhưng chưa có CSIRT/playbook/quy trình điều phối sự cố bảo mật chuyên nghiệp.                                                            |
+| **Nhân sự chuyên trách ATTT**      | Đội hình hiện thiên về dev và system admin kiêm nhiệm, thiếu Security Architect, Network Architect, DevSecOps, SIEM Engineer, Compliance Officer, Incident Coordinator. |

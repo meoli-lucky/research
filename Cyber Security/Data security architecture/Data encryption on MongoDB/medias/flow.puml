@@ -1,0 +1,71 @@
+@startuml
+skinparam backgroundColor white
+skinparam handwritten false
+skinparam roundcorner 10
+skinparam shadowing true
+
+' Định nghĩa các màu sắc chủ đạo
+!define VAULT_COLOR #F96
+!define APP_COLOR #69C
+!define DB_COLOR #439A86
+!define DISK_COLOR #666
+
+skinparam rectangle {
+    BackgroundColor white
+    BorderColor #333
+}
+
+' ==========================================
+' Cấu trúc các thành phần hệ thống
+' ==========================================
+
+rectangle "HashiCorp Vault / OpenBao\n(Central KMS)" as Vault_Zone #F96 {
+    artifact "App Master Key\n(path: transit/keys/csfle-master-key)" as AppMasterKey
+    artifact "Disk Key cho Infra\n(path: secret/data/infra/disk-key)" as DBDiskKey
+}
+
+rectangle "Tầng Ứng Dụng\n(On-premise)" as App_Zone #69C {
+    node "Dịch vụ Nghiệp vụ\n(Business Service)" as BusinessService
+}
+
+rectangle "Tầng Cơ Sở Dữ Liệu\n(Percona MongoDB Replica Set)" as DB_Zone #439A86 {
+    database "Node 1: PRIMARY\n(WiredTiger Engine)" as NodePrimary
+    database "Node 2: SECONDARY" as NodeSec1
+    database "Node 3: SECONDARY" as NodeSec2
+    
+    collections "Collection: encryption.__keyVault\n(Lưu trữ các Khóa con DEK)" as KeyVaultColl
+}
+
+rectangle "Hệ Thống Lưu Trữ Vật Lý" as Disk_Zone {
+    storage "Ổ cứng vật lý Node 1\n[Mã hóa tĩnh]" as DiskP #666
+    storage "Ổ cứng vật lý Node 2\n[Mã hóa tĩnh]" as DiskS1 #666
+    storage "Ổ cứng vật lý Node 3\n[Mã hóa tĩnh]" as DiskS2 #666
+}
+
+' ==========================================
+' Luồng tương tác và dữ liệu (Data Flow)
+' ==========================================
+
+' 1. Khởi tạo và Quản lý khóa con
+BusinessService -up-> AppMasterKey : "1. Gọi lấy Master Key"
+BusinessService <--> KeyVaultColl : "2. Đọc/Ghi khóa con DEK đã bọc"
+note right of BusinessService
+  **Mở bọc DEK:**
+  Dùng Master Key mở bọc 
+  khóa DEK trực tiếp trên RAM.
+end note
+
+' 2. Ghi dữ liệu (CSFLE)
+BusinessService -> BusinessService : "3. Mã hóa trường nhạy cảm\nthành BinData Subtype 6"
+BusinessService --> NodePrimary : "4. Gửi dữ liệu đã mã hóa\ncấp trường qua TLS"
+
+' 3. Hạ tầng Cơ sở dữ liệu & Lưu trữ (Data-at-Rest)
+NodePrimary -up-> DBDiskKey : "5. Đọc khóa đĩa khi khởi động"
+NodePrimary .down.> NodeSec1 : "6. Đồng bộ Oplog (Chuỗi nhị phân)"
+NodePrimary .down.> NodeSec2 : "6. Đồng bộ Oplog (Chuỗi nhị phân)"
+
+NodePrimary ==> DiskP : "7. Mã hóa toàn bộ Block dữ liệu"
+NodeSec1 ==> DiskS1 : "7. Mã hóa toàn bộ Block dữ liệu"
+NodeSec2 ==> DiskS2 : "7. Mã hóa toàn bộ Block dữ liệu"
+
+@enduml
